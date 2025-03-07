@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Contraseñas Seguras</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { transition: background 0.3s ease, color 0.3s ease; }
+    </style>
+</head>
+<body class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen p-4">
+    <div class="bg-gray-800 p-6 rounded-2xl shadow-lg w-full max-w-md text-lg text-center">
+        <h1 class="text-2xl font-bold text-blue-400">Generador de Contraseñas</h1>
+        
+        <div class="mt-4 text-left">
+            <label class="block">Longitud: <span id="lengthValue">16</span></label>
+            <input id="length" type="range" min="8" max="32" value="16" class="w-full">
+        </div>
+        
+        <div class="flex flex-wrap gap-2 my-4">
+            <label><input type="checkbox" id="numbers" checked> Números</label>
+            <label><input type="checkbox" id="uppercase" checked> Mayúsculas</label>
+            <label><input type="checkbox" id="lowercase" checked> Minúsculas</label>
+            <label><input type="checkbox" id="symbols" checked> Símbolos</label>
+            <label><input type="checkbox" id="words"> Palabras Aleatorias</label>
+        </div>
+        
+        <div class="relative">
+            <input id="password" type="text" readonly class="w-full p-2 rounded-lg text-gray-900">
+            <button onclick="copyPassword()" class="absolute right-2 top-2 text-gray-600 hover:text-gray-900">
+                <i data-lucide="clipboard"></i>
+            </button>
+        </div>
+        
+        <button onclick="generatePassword()" class="mt-4 bg-blue-500 px-4 py-2 rounded-lg hover:bg-blue-600">Generar</button>
+    </div>
+    
+    <script>
+        lucide.createIcons();
+        document.getElementById("length").addEventListener("input", function() {
+            document.getElementById("lengthValue").textContent = this.value;
+        });
+        
+        function getRandomChar(set) {
+            const randomValues = new Uint32Array(1);
+            window.crypto.getRandomValues(randomValues);
+            return set[randomValues[0] % set.length];
+        }
+        
+        function generatePassword() {
+            const length = document.getElementById("length").value;
+            const numbers = "0123456789";
+            const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const lowercase = "abcdefghijklmnopqrstuvwxyz";
+            const symbols = "!@#$%^&*()_+[]{}|;:,.<>?";
+            const words = ["Sol", "Luna", "Rayo", "Viento", "Mar", "Fuego", "Estrella", "Montaña"];
+            
+            let chars = "";
+            if (document.getElementById("numbers").checked) chars += numbers;
+            if (document.getElementById("uppercase").checked) chars += uppercase;
+            if (document.getElementById("lowercase").checked) chars += lowercase;
+            if (document.getElementById("symbols").checked) chars += symbols;
+            
+            let password = "";
+            if (document.getElementById("words").checked) {
+                for (let i = 0; i < 3; i++) {
+                    password += words[Math.floor(Math.random() * words.length)] + "-";
+                }
+                password = password.slice(0, -1);
+            } else {
+                for (let i = 0; i < length; i++) {
+                    password += getRandomChar(chars);
+                }
+            }
+            document.getElementById("password").value = password;
+        }
+        
+        function copyPassword() {
+            const passwordField = document.getElementById("password");
+            passwordField.select();
+            document.execCommand("copy");
+            alert("Contraseña copiada");
+        }
+    </script>
+</body>
+</html>
